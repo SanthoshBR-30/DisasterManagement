@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map </title>
+    <link rel="stylesheet" href="../assets/css/map.css">
+</head>
+<body>
+    <%- include("partials/header.ejs") %>
+
+     <!-- Map Page -->
+     <div id="map-page" class="page" >
+        <section class="section map-section">
+            <div class="container">
+                <div class="section-title">
+                    <h2>Find Resources Near You</h2>
+                    <p>Locate shelters, food distribution centers, and medical facilities in your area.</p>
+                </div>
+                
+                <div class="resource-filter">
+                    <button class="filter-btn active" data-filter="all">All Resources</button>
+                    <button class="filter-btn" data-filter="shelter">Shelters</button>
+                    <button class="filter-btn" data-filter="food">Food</button>
+                    <button class="filter-btn" data-filter="medical">Medical</button>
+                </div>
+                
+                <div id="map"></div>
+                
+                <div class="loading-spinner" id="map-loading"></div>
+            </div>
+        </section>
+    </div>
+
+    <%- include("partials/footer.ejs") %>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SoS Page</title>
+    <link rel="stylesheet" href="../assets/css/sos.css">
+</head>
+<body>
+
+    <%- include("partials/header") %>
+
+     <!-- SOS Page -->
+     <div id="sos-page" class="page" ">
+        <section class="section sos-section">
+            <div class="container">
+                <div class="section-title">
+                    <h2>Emergency SOS</h2>
+                    <p>Quickly request help during emergencies. Your location will be shared with emergency services.</p>
+                </div>
+                
+                <div class="sos-card">
+                    <div class="sos-button" id="sos-emergency">SOS</div>
+                    <p>Press the SOS button to send an emergency alert with your current location.</p>
+                    
+                    <div class="send-message">
+                        <h3>Include Additional Information</h3>
+                        <textarea class="message-area" id="sos-message" placeholder="Describe your situation or specific needs..."></textarea>
+                        <button class="btn btn-block" id="send-sos-message">Send Message with Location</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <%- include("partials/footer.ejs") %>
+</body>
+</html>

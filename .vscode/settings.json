@@ -1,0 +1,4 @@
+{
+    "liveshare.languages.allowGuestCommandControl": true,
+    "liveshare.launcherClient": "visualStudioCode"
+}

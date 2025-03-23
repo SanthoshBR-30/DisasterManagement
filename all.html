@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeHaven - Disaster Management</title>
+    <style>
+        /* Global Styles */
+      
+        
+        
+       
+      
+       
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 36px;
+            }
+            
+            .btn-group .btn {
+                display: block;
+                margin-bottom: 10px;
+                width: 100%;
+            }
+            
+            .navbar-content {
+                flex-direction: column;
+            }
+            
+            .nav-links {
+                margin-top: 15px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .nav-links li {
+                margin: 5px 10px;
+            }
+        }
+        
+       
+        
+       
+        
+        /* Dashboard Page */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .dashboard-card {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .dashboard-card h3 {
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+        
+        .dashboard-card .count {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .dashboard-card .status {
+            display: flex;
+            align-items: center;
+            color: #666;
+        }
+        
+        .dashboard-card .status.up {
+            color: var(--success);
+        }
+        
+        .dashboard-card .status.down {
+            color: var(--danger);
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: white;
+            color: var(--dark);
+            padding: 15px 20px;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            display: none;
+            z-index: 2000;
+            animation: slideIn 0.3s forwards;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .notification.success {
+            border-left: 4px solid var(--success);
+        }
+        
+        .notification.error {
+            border-left: 4px solid var(--danger);
+        }
+        
+        .notification.info {
+            border-left: 4px solid var(--primary);
+        }
+    </style>
+</head>
+<body>
+   
+
+   
+
+   
+       
+
+       
+
+        
+
+       
+
+    <!-- JavaScript -->
+    <script>
+        // DOM Elements
+        const loginPage = document.getElementById('login-page');
+        const app = document.getElementById('app');
+        const loginForm = document.getElementById('login-form');
+        const registerLink = document.getElementById('register-link');
+        const registerModal = document.getElementById('register-modal');
+        const closeRegister = document.getElementById('close-register');
+        const registerForm = document.getElementById('register-form');
+        const logoutBtn = document.getElementById('logout');
+        const navLinks = document.querySelectorAll('.nav-link');
+        const pages = document.querySelectorAll('.page');
+        const sosBtnHome = document.getElementById('sos-btn');
+        const findResourcesBtn = document.getElementById('find-resources-btn');
+        const sosEmergency = document.getElementById('sos-emergency');
+        const sendSosMessage = document.getElementById('send-sos-message');
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const notification = document.getElementById('notification');
+        const profileTabs = document.querySelectorAll('.profile-menu a');
+        const profileTabContents = document.querySelectorAll('.profile-tab');
+        const personalForm = document.getElementById('personal-form');
+        const settingsForm = document.getElementById('settings-form');
+        const addContactBtn = document.getElementById('add-contact');
+        const saveContactsBtn = document.getElementById('save-contacts');
+        const mapLoading = document.getElementById('map-loading');
+
+        // Auth State
+        let isLoggedIn = false;
+        let currentUser = null;
+
+        // User Data (Mock)
+        const userData = {
+            id: '123456',
+            name: 'John Doe',
+            email: 'john.doe@example.com',
+            phone: '+1 (555) 123-4567',
+            address: '123 Main St, Anytown, USA',
+            emergencyContacts: [
+                { name: 'Jane Doe', phone: '+1 (555) 987-6543', email: 'jane.doe@example.com' }
+            ]
+        };
+
+        // Resource Data (Mock)
+        const resourceData = [
+            { id: 1, type: 'shelter', name: 'Community Center Shelter', address: '456 Oak St', lat: 40.7128, lng: -74.0060, capacity: 200, occupancy: 120 },
+            { id: 2, type: 'food', name: 'Food Distribution Center', address: '789 Maple Ave', lat: 40.7138, lng: -74.0050, supplies: 'High' },
+            { id: 3, type: 'medical', name: 'Emergency Medical Station', address: '101 Pine Rd', lat: 40.7118, lng: -74.0070, staff: 'Available' },
+            { id: 4, type: 'shelter', name: 'High School Gymnasium', address: '202 Cedar Ln', lat: 40.7145, lng: -74.0080, capacity: 150, occupancy: 85 },
+            { id: 5, type: 'food', name: 'Red Cross Food Bank', address: '303 Birch Blvd', lat: 40.7160, lng: -74.0040, supplies: 'Medium' },
+            { id: 6, type: 'medical', name: 'Mobile Medical Unit', address: '404 Willow Way', lat: 40.7135, lng: -74.0090, staff: 'Limited' },
+        ];
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            // Login Form
+            loginForm.addEventListener('submit', handleLogin);
+            
+            // Register Form
+            registerLink.addEventListener('click', openRegisterModal);
+            closeRegister.addEventListener('click', closeRegisterModal);
+            registerForm.addEventListener('submit', handleRegister);
+            
+            // Logout
+            logoutBtn.addEventListener('click', handleLogout);
+            
+            // Navigation
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const pageName = link.getAttribute('data-page');
+                    navigateToPage(pageName);
+                });
+            });
+            
+            // Home Page Buttons
+            sosBtnHome.addEventListener('click', (e) => {
+                e.preventDefault();
+                navigateToPage('sos');
+            });
+            
+            findResourcesBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                navigateToPage('map');
+            });
+            
+            // SOS Buttons
+            sosEmergency.addEventListener('click', sendSOSAlert);
+            sendSosMessage.addEventListener('click', sendSOSMessage);
+            
+            // Filter Buttons
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    const filter = btn.getAttribute('data-filter');
+                    filterResources(filter);
+                });
+            });
+            
+            // Profile Tabs
+            profileTabs.forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const tabName = tab.getAttribute('data-tab');
+                    switchProfileTab(tabName);
+                });
+            });
+            
+            // Profile Forms
+            personalForm.addEventListener('submit', savePersonalInfo);
+            settingsForm.addEventListener('submit', saveSettings);
+            addContactBtn.addEventListener('click', addEmergencyContact);
+            saveContactsBtn.addEventListener('click', saveEmergencyContacts);
+            
+            // Check for saved login
+            checkLogin();
+        });
+
+        // Auth Functions
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            // Simulate login (replace with actual API call)
+            showLoading();
+            
+            setTimeout(() => {
+                if (email && password) {
+                    // For demo purposes, any non-empty credentials work
+                    loginSuccess(userData);
+                } else {
+                    showNotification('Please enter both email and password', 'error');
+                }
+                hideLoading();
+            }, 1000);
+        }
+
+        function handleRegister(e) {
+            e.preventDefault();
+            const name = document.getElementById('register-name').value;
+            const email = document.getElementById('register-email').value;
+            const password = document.getElementById('register-password').value;
+            const confirm = document.getElementById('register-confirm').value;
+            const phone = document.getElementById('phone').value;
+            
+            if (password !== confirm) {
+                showNotification('Passwords do not match', 'error');
+                return;
+            }
+            
+            // Simulate registration (replace with actual API call)
+            showLoading();
+            
+            setTimeout(() => {
+                if (name && email && password && phone) {
+                    const newUser = {
+                        id: Date.now().toString(),
+                        name,
+                        email,
+                        phone,
+                        address: '',
+                        emergencyContacts: []
+                    };
+                    
+                    closeRegisterModal();
+                    showNotification('Account created successfully!', 'success');
+                    loginSuccess(newUser);
+                } else {
+                    showNotification('Please fill all required fields', 'error');
+                }
+                hideLoading();
+            }, 1000);
+        }
+
+        function loginSuccess(user) {
+            currentUser = user;
+            isLoggedIn = true;
+            
+            // Update profile info
+            document.getElementById('profile-name').textContent = user.name;
+            document.getElementById('profile-email').textContent = user.email;
+            document.getElementById('profile-full-name').value = user.name;
+            document.getElementById('profile-phone').value = user.phone || '';
+            document.getElementById('profile-address').value = user.address || '';
+            document.getElementById('settings-email').value = user.email;
+            
+            // Save to local storage (for demo purposes)
+            localStorage.setItem('currentUser', JSON.stringify(user));
+            
+            // Show main app
+            loginPage.style.display = 'none';
+            app.style.display = 'block';
+            
+            // Navigate to home
+            navigateToPage('home');
+            
+            showNotification('Login successful!', 'success');
+            
+            // Initialize map
+            setTimeout(() => {
+                initMap();
+            }, 500);
+        }
+
+        function handleLogout() {
+            // Clear user data
+            currentUser = null;
+            isLoggedIn = false;
+            localStorage.removeItem('currentUser');
+            
+            // Show login page
+            app.style.display = 'none';
+            loginPage.style.display = 'flex';
+            
+            showNotification('Logged out successfully', 'info');
+        }
+
+        function checkLogin() {
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                isLoggedIn = true;
+                loginSuccess(currentUser);
+            }
+        }
+
+        // Navigation Functions
+        function navigateToPage(pageName) {
+            // Hide all pages
+            pages.forEach(page => {
+                page.style.display = 'none';
+            });
+            
+            // Show selected page
+            document.getElementById(`${pageName}-page`).style.display = 'block';
+            
+            // Update active link
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('data-page') === pageName) {
+                    link.classList.add('active');
+                }
+            });
+            
+            // Special page actions
+            if (pageName === 'map') {
+                // Refresh map if needed
+                if (window.map) {
+                    window.map.updateSize();
+                    centerMap();
+                }
+            }
+        }
+
+        // Map Functions
+        function initMap() {
+            // This is a placeholder - in a real app, you would use Google Maps, Mapbox, or another mapping API
+            // For demo purposes, we'll simulate a map
+            mapLoading.style.display = 'block';
+            
+            setTimeout(() => {
+                mapLoading.style.display = 'none';
+                showNotification('Map loaded with 6 nearby resources', 'info');
+                
+                // Simulate map element
+                const mapElement = document.getElementById('map');
+                mapElement.innerHTML = `
+                    <div style="padding: 20px; background-color: #f0f0f0; border-radius: 5px; text-align: center;">
+                        <h3>Interactive Map</h3>
+                        <p>In a real implementation, this would be an interactive map showing resource locations.</p>
+                        <div style="margin-top: 20px; font-weight: bold;">Resources near your location:</div>
+                        <div id="resource-list" style="margin-top: 10px; text-align: left; padding: 15px;"></div>
+                    </div>
+                `;
+                
+                // Display resources
+                displayResourceList();
+                
+                // Store map reference
+                window.map = {
+                    updateSize: function() {
+                        // Placeholder for map resize function
+                    }
+                };
+            }, 1500);
+        }
+
+        function displayResourceList() {
+            const resourceList = document.getElementById('resource-list');
+            if (!resourceList) return;
+            
+            let html = '';
+            resourceData.forEach(resource => {
+                html += `
+                    <div class="resource-item" data-type="${resource.type}" style="margin-bottom: 10px; padding: 10px; background-color: white; border-radius: 5px;">
+                        <strong>${resource.name}</strong> (${resource.type.charAt(0).toUpperCase() + resource.type.slice(1)})<br>
+                        ${resource.address}<br>
+                        <span style="color: #666;">Distance: ${(Math.random() * 5).toFixed(1)} miles</span>
+                    </div>
+                `;
+            });
+            
+            resourceList.innerHTML = html;
+        }
+
+        function filterResources(filter) {
+            const resourceItems = document.querySelectorAll('.resource-item');
+            
+            resourceItems.forEach(item => {
+                const type = item.getAttribute('data-type');
+                if (filter === 'all' || filter === type) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+            
+            if (filter === 'all') {
+                showNotification('Showing all resources', 'info');
+            } else {
+                const count = resourceData.filter(r => r.type === filter).length;
+                showNotification(`Showing ${count} ${filter} resources`, 'info');
+            }
+        }
+
+        // SOS Functions
+        function sendSOSAlert() {
+            if (!navigator.geolocation) {
+                showNotification('Geolocation is not supported by your browser', 'error');
+                return;
+            }
+            
+            showLoading();
+            
+            setTimeout(() => {
+                // Simulate geolocation API
+                const location = {
+                    latitude: 40.7128,
+                    longitude: -74.0060
+                };
+                
+                // Send SOS alert with location (simulate API call)
+                const sosData = {
+                    userId: currentUser.id,
+                    userName: currentUser.name,
+                    location,
+                    timestamp: new Date().toISOString(),
+                    type: 'emergency'
+                };
+                
+                console.log('SOS Alert sent:', sosData);
+                
+                hideLoading();
+                showNotification('Emergency alert sent with your location!', 'success');
+            }, 2000);
+        }
+
+        function sendSOSMessage() {
+            const message = document.getElementById('sos-message').value;
+            
+            if (!message) {
+                showNotification('Please enter a message', 'error');
+                return;
+            }
+            
+            showLoading();
+            
+            setTimeout(() => {
+                // Simulate geolocation API
+                const location = {
+                    latitude: 40.7128,
+                    longitude: -74.0060
+                };
+                
+                // Send SOS message with location (simulate API call)
+                const sosData = {
+                    userId: currentUser.id,
+                    userName: currentUser.name,
+                    message,
+                    location,
+                    timestamp: new Date().toISOString(),
+                    type: 'message'
+                };
+                
+                console.log('SOS Message sent:', sosData);
+                
+                // Clear message
+                document.getElementById('sos-message').value = '';
+                
+                hideLoading();
+                showNotification('Your message was sent with location!', 'success');
+            }, 1500);
+        }
+
+        // Profile Functions
+        function switchProfileTab(tabName) {
+            // Update tab links
+            profileTabs.forEach(tab => {
+                if (tab.getAttribute('data-tab') === tabName) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+            
+            // Show selected tab content
+            profileTabContents.forEach(content => {
+                if (content.id === tabName + '-tab') {
+                    content.style.display = 'block';
+                } else {
+                    content.style.display = 'none';
+                }
+            });
+        }
+
+        function savePersonalInfo(e) {
+            e.preventDefault();
+            
+            showLoading();
+            
+            setTimeout(() => {
+                // Update user data
+                currentUser.name = document.getElementById('profile-full-name').value;
+                currentUser.phone = document.getElementById('profile-phone').value;
+                currentUser.address = document.getElementById('profile-address').value;
+                currentUser.medical = document.getElementById('profile-medical').value;
+                
+                // Update displayed name
+                document.getElementById('profile-name').textContent = currentUser.name;
+                
+                // Save to local storage (for demo)
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                
+                hideLoading();
+                showNotification('Personal information updated', 'success');
+            }, 1000);
+        }
+
+        function saveSettings(e) {
+            e.preventDefault();
+            
+            const newPassword = document.getElementById('settings-password').value;
+            const confirmPassword = document.getElementById('settings-confirm').value;
+            
+            if (newPassword && newPassword !== confirmPassword) {
+                showNotification('Passwords do not match', 'error');
+                return;
+            }
+            
+            showLoading();
+            
+            setTimeout(() => {
+                // Update email
+                const newEmail = document.getElementById('settings-email').value;
+                currentUser.email = newEmail;
+                
+                // Update displayed email
+                document.getElementById('profile-email').textContent = newEmail;
+                
+                // Update notification preferences
+                currentUser.notifications = {
+                    email: document.getElementById('notify-email').checked,
+                    sms: document.getElementById('notify-sms').checked,
+                    app: document.getElementById('notify-app').checked
+                };
+                
+                // Save to local storage (for demo)
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                
+                // Clear password fields
+                document.getElementById('settings-password').value = '';
+                document.getElementById('settings-confirm').value = '';
+                
+                hideLoading();
+                showNotification('Account settings updated', 'success');
+            }, 1000);
+        }
+
+        function addEmergencyContact() {
+            const contactsContainer = document.getElementById('emergency-contacts');
+            const newContact = document.createElement('div');
+            newContact.className = 'form-group';
+            newContact.innerHTML = `
+                <label>New Contact</label>
+                <input type="text" class="form-control" placeholder="Name">
+                <input type="tel" class="form-control" placeholder="Phone Number" style="margin-top: 10px;">
+                <input type="email" class="form-control" placeholder="Email" style="margin-top: 10px;">
+                <button type="button" class="remove-contact" style="margin-top: 10px; color: red; background: none; border: none; cursor: pointer;">Remove</button>
+            `;
+            
+            contactsContainer.appendChild(newContact);
+            
+            // Add remove event listener
+            newContact.querySelector('.remove-contact').addEventListener('click', function() {
+                contactsContainer.removeChild(newContact);
+            });
+        }
+
+        function saveEmergencyContacts() {
+            showLoading();
+            
+            setTimeout(() => {
+                // Get all contacts
+                const contacts = [];
+                const contactElements = document.getElementById('emergency-contacts').children;
+                
+                for (let i = 0; i < contactElements.length; i++) {
+                    const element = contactElements[i];
+                    const inputs = element.querySelectorAll('input');
+                    
+                    const name = inputs[0].value.trim();
+                    const phone = inputs[1].value.trim();
+                    const email = inputs[2].value.trim();
+                    
+                    if (name || phone || email) {
+                        contacts.push({ name, phone, email });
+                    }
+                }
+                
+                // Update user data
+                currentUser.emergencyContacts = contacts;
+                
+                // Save to local storage (for demo)
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                
+                hideLoading();
+                showNotification('Emergency contacts updated', 'success');
+            }, 1000);
+        }
+
+        // UI Helper Functions
+        function openRegisterModal() {
+            registerModal.style.display = 'flex';
+        }
+
+        function closeRegisterModal() {
+            registerModal.style.display = 'none';
+        }
+
+        function showLoading() {
+            document.getElementById('loading-modal').style.display = 'flex';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading-modal').style.display = 'none';
+        }
+
+        function showNotification(message, type = 'info') {
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.style.display = 'block';
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+
+        // Close modal when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target === registerModal) {
+                closeRegisterModal();
+            }
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            if (window.map) {
+                window.map.updateSize();
+            }
+        });
+    </script>
+</body>
+</html>

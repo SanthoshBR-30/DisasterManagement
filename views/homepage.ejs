@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homepage</title>
+    <link rel="stylesheet" href="/assets/css/homepage.css">
+
+</head>
+<body>
+     <!-- Main Application (Initially Hidden) -->
+
+     <%- include("partials/header") %>
+
+
+     <div id="app" >
+        
+        
+
+        <!-- Home Page -->
+        <div id="home-page" class="page">
+            <section class="hero">
+                <div class="container hero-content">
+                    <h1>Stay Safe During Disasters</h1>
+                    <p>SafeHaven provides real-time information and resources to help you navigate through natural disasters and emergencies. Find shelters, food, and medical assistance, or send an SOS when you need immediate help.</p>
+                    <div class="btn-group">
+                        <!-- <a href="#" class="btn btn-danger" id="sos-btn">SOS Emergency</a>
+                        <a href="#" class="btn btn-outline" id="find-resources-btn">Find Resources</a> -->
+                    </div>
+                </div>
+            </section>
+
+            <section class="section">
+                <div class="container">
+                    <div class="section-title">
+                        <h2>How We Help</h2>
+                        <p>SafeHaven provides critical services to help you before, during, and after disasters.</p>
+                    </div>
+                    <div class="features">
+                        <div class="feature-card">
+                            <div class="feature-icon">📍</div>
+                            <h3>Resource Mapping</h3>
+                            <p>Find nearby shelters, food distribution centers, and medical facilities using our interactive map.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">🆘</div>
+                            <h3>Emergency SOS</h3>
+                            <p>Send emergency alerts with your location to rescue teams and emergency contacts.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">📱</div>
+                            <h3>Live Location Sharing</h3>
+                            <p>Share your real-time location with family members and emergency services.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section">
+                <div class="container">
+                    <div class="section-title">
+                        <h2>Current Alerts</h2>
+                        <p>Stay informed about ongoing emergencies and warnings in your area.</p>
+                    </div>
+                    <div class="dashboard">
+                        <div class="dashboard-card">
+                            <h3>Weather Alerts</h3>
+                            <div class="count">3</div>
+                            <div class="status">Active warnings in your area</div>
+                        </div>
+                        <div class="dashboard-card">
+                            <h3>Nearby Shelters</h3>
+                            <div class="count">8</div>
+                            <div class="status">Available within 10 miles</div>
+                        </div>
+                        <div class="dashboard-card">
+                            <h3>Emergency Services</h3>
+                            <div class="count">5</div>
+                            <div class="status up">All services operational</div>
+                        </div>
+                    </div> 
+                </div>
+            </section>
+        </div>
+
+        <%- include("partials/footer") %>
+</body>
+</html>
