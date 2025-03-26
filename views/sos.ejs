@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SoS Page</title>
+    <title>Emergency SOS</title>
     <link rel="stylesheet" href="../assets/css/sos.css">
 </head>
 <body>
 
     <%- include("partials/header") %>
 
-     <!-- SOS Page -->
-     <div id="sos-page" class="page" ">
+    <!-- SOS Page -->
+    <div id="sos-page" class="page">
         <section class="section sos-section">
             <div class="container">
                 <div class="section-title">
@@ -20,12 +20,12 @@
                 </div>
                 
                 <div class="sos-card">
-                    <div class="sos-button" id="sos-emergency">SOS</div>
+                    <button class="sos-button" id="sos-emergency">🚨 SOS</button>
                     <p>Press the SOS button to send an emergency alert with your current location.</p>
                     
                     <div class="send-message">
                         <h3>Include Additional Information</h3>
-                        <textarea class="message-area" id="sos-message" placeholder="Describe your situation or specific needs..."></textarea>
+                        <textarea class="message-area" id="sos-message" placeholder="Describe your situation..."></textarea>
                         <button class="btn btn-block" id="send-sos-message">Send Message with Location</button>
                     </div>
                 </div>
@@ -33,6 +33,48 @@
         </section>
     </div>
 
-    <%- include("partials/footer.ejs") %>
+    <%- include("partials/footer") %>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const sosButton = document.getElementById("sos-emergency");
+            const sendMessageButton = document.getElementById("send-sos-message");
+
+            async function sendSOSAlert() {
+                if (!navigator.geolocation) {
+                    alert("Geolocation is not supported by your browser.");
+                    return;
+                }
+
+                navigator.geolocation.getCurrentPosition(async (position) => {
+                    const latitude = position.coords.latitude;
+                    const longitude = position.coords.longitude;
+                    const message = document.getElementById("sos-message").value || "Emergency! Need immediate help.";
+
+                    const response = await fetch("/api/sos", {
+                        method: "POST",
+                        headers: { 
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${localStorage.getItem("token")}`
+                        },
+                        body: JSON.stringify({ latitude, longitude, message }),
+                    });
+
+                    const data = await response.json();
+                    if (response.ok) {
+                        alert("SOS alert sent to your emergency contact!");
+                    } else {
+                        alert("Failed to send SOS alert: " + data.message);
+                    }
+                }, () => {
+                    alert("Unable to retrieve your location.");
+                });
+            }
+
+            sosButton.addEventListener("click", sendSOSAlert);
+            sendMessageButton.addEventListener("click", sendSOSAlert);
+        });
+    </script>
+
 </body>
 </html>
