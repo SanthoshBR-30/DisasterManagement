@@ -16,7 +16,7 @@
             <div class="container">
                 <div class="section-title">
                     <h2>Emergency SOS</h2>
-                    <p>Quickly request help during emergencies. Your location will be shared with emergency services.</p>
+                    <p>Quickly request help during emergencies. Your location will be shared with your emergency contact.</p>
                 </div>
                 
                 <div class="sos-card">
@@ -36,44 +36,52 @@
     <%- include("partials/footer") %>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const sosButton = document.getElementById("sos-emergency");
-            const sendMessageButton = document.getElementById("send-sos-message");
+        document.getElementById("sos-emergency").addEventListener("click", sendSOSAlert);
+document.getElementById("send-sos-message").addEventListener("click", sendSOSAlert);
 
-            async function sendSOSAlert() {
-                if (!navigator.geolocation) {
-                    alert("Geolocation is not supported by your browser.");
-                    return;
-                }
+async function sendSOSAlert() {
+    if (!navigator.geolocation) {
+        alert("⚠️ Geolocation is not supported by your browser.");
+        return;
+    }
 
-                navigator.geolocation.getCurrentPosition(async (position) => {
-                    const latitude = position.coords.latitude;
-                    const longitude = position.coords.longitude;
-                    const message = document.getElementById("sos-message").value || "Emergency! Need immediate help.";
+    navigator.geolocation.getCurrentPosition(async (position) => {
+        const latitude = position.coords.latitude;
+        const longitude = position.coords.longitude;
+        const message = document.getElementById("sos-message").value || "🚨 Emergency! Need help!";
+        const token = localStorage.getItem("token"); // ✅ Retrieve token
 
-                    const response = await fetch("/api/sos", {
-                        method: "POST",
-                        headers: { 
-                            "Content-Type": "application/json",
-                            "Authorization": `Bearer ${localStorage.getItem("token")}`
-                        },
-                        body: JSON.stringify({ latitude, longitude, message }),
-                    });
+        if (!token) {
+            alert("⚠️ No authentication token found. Please log in again.");
+            window.location.href = "/login"; // Redirect to login
+            return;
+        }
 
-                    const data = await response.json();
-                    if (response.ok) {
-                        alert("SOS alert sent to your emergency contact!");
-                    } else {
-                        alert("Failed to send SOS alert: " + data.message);
-                    }
-                }, () => {
-                    alert("Unable to retrieve your location.");
-                });
+        try {
+            const response = await fetch("/api/sos", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`, // ✅ Include token
+                },
+                body: JSON.stringify({ latitude, longitude, message }),
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                alert("🚨 SOS alert sent successfully!");
+            } else {
+                alert("⚠️ Failed to send SOS alert: " + data.message);
             }
+        } catch (error) {
+            console.error("❌ Error sending SOS request:", error);
+            alert("❌ An error occurred while sending the SOS request.");
+        }
+    }, () => {
+        alert("⚠️ Unable to retrieve your location.");
+    });
+}
 
-            sosButton.addEventListener("click", sendSOSAlert);
-            sendMessageButton.addEventListener("click", sendSOSAlert);
-        });
     </script>
 
 </body>

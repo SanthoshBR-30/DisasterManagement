@@ -2,6 +2,7 @@ const express = require("express");
 const path = require("path");
 const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
+const sosRoutes = require("./routes/sosRoutes"); // <-- Add SOS Route
 const cors = require("cors");
 const bodyParser = require("body-parser");
 require("dotenv").config();
@@ -26,6 +27,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/sos", sosRoutes); // <-- Add this line
 
 // Render pages
 app.get("/", (req, res) => {
