@@ -4,121 +4,81 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile</title>
-    <link rel="stylesheet" href="../assets/css/profile.css">
+    
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .profile-container {
+    background: white;
+    border-radius: 10px;
+    padding: 30px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15);
+    max-width: 500px;
+    margin: 60px auto 60px 10%; /* Shifted slightly left */
+}
+
+.profile-container h3 {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.profile-container .form-label {
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.profile-container .form-control {
+    font-size: 15px;
+    padding: 8px 12px;
+    text-align: left;
+}
+
+
+    </style>
 </head>
 <body>
 
     <%- include("partials/header.ejs") %>
 
-    <!-- Profile Page -->
-    <div id="profile-page" class="page" >
-        <section class="section">
-            <div class="container">
-                <div class="section-title">
-                    <h2>My Profile</h2>
-                    <p>Manage your account settings and emergency contacts.</p>
-                </div>
-                
-                <div class="profile-container">
-                    <div class="profile-sidebar">
-                        
-                        <div class="profile-info">
-                            <h2 id="profile-name">John Doe</h2>
-                            <p id="profile-email">john.doe@example.com</p>
-                        </div>
-                        <ul class="profile-menu">
-                            <li><a href="#" class="active" data-tab="personal">Personal Information</a></li>
-                            <li><a href="#" data-tab="emergency">Emergency Contacts</a></li>
-                            <li><a href="#" data-tab="settings">Account Settings</a></li>
-                        </ul>
-                    </div>
-                    
-                    <div class="profile-content">
-                        <!-- Personal Information Tab -->
-                        <div class="profile-tab" id="personal-tab">
-                            <h3>Personal Information</h3>
-                            <form id="personal-form">
-                                <div class="form-group">
-                                    <label for="profile-full-name">Full Name</label>
-                                    <input type="text" id="profile-full-name" class="form-control" value="John Doe">
-                                </div>
-                                <div class="form-group">
-                                    <label for="profile-phone">Phone Number</label>
-                                    <input type="tel" id="profile-phone" class="form-control" value="+1 (555) 123-4567">
-                                </div>
-                                <div class="form-group">
-                                    <label for="profile-address">Home Address</label>
-                                    <input type="text" id="profile-address" class="form-control" value="123 Main St, Anytown, USA">
-                                </div>
-                                <div class="form-group">
-                                    <label for="profile-medical">Medical Information (Optional)</label>
-                                    <textarea id="profile-medical" class="form-control" placeholder="Enter any relevant medical information"></textarea>
-                                </div>
-                                <button type="submit" class="btn">Save Changes</button>
-                            </form>
-                        </div>
-                        
-                        <!-- Emergency Contacts Tab -->
-                        <div class="profile-tab" id="emergency-tab" style="display: none;">
-                            <h3>Emergency Contacts</h3>
-                            <div id="emergency-contacts">
-                                <div class="form-group">
-                                    <label>Contact 1</label>
-                                    <input type="text" class="form-control" placeholder="Name" value="Jane Doe">
-                                    <input type="tel" class="form-control" placeholder="Phone Number" value="+1 (555) 987-6543" style="margin-top: 10px;">
-                                    <input type="email" class="form-control" placeholder="Email" value="jane.doe@example.com" style="margin-top: 10px;">
-                                </div>
-                                <div class="form-group">
-                                    <label>Contact 2</label>
-                                    <input type="text" class="form-control" placeholder="Name">
-                                    <input type="tel" class="form-control" placeholder="Phone Number" style="margin-top: 10px;">
-                                    <input type="email" class="form-control" placeholder="Email" style="margin-top: 10px;">
-                                </div>
-                            </div>
-                            <button id="add-contact" class="btn">Add Contact</button>
-                            <button id="save-contacts" class="btn" style="margin-left: 10px;">Save Changes</button>
-                        </div>
-                        
-                        <!-- Account Settings Tab -->
-                        <div class="profile-tab" id="settings-tab" style="display: none;">
-                            <h3>Account Settings</h3>
-                            <form id="settings-form">
-                                <div class="form-group">
-                                    <label for="settings-email">Email Address</label>
-                                    <input type="email" id="settings-email" class="form-control" value="john.doe@example.com">
-                                </div>
-                                <div class="form-group">
-                                    <label for="settings-password">Change Password</label>
-                                    <input type="password" id="settings-password" class="form-control" placeholder="Enter new password">
-                                </div>
-                                <div class="form-group">
-                                    <label for="settings-confirm">Confirm New Password</label>
-                                    <input type="password" id="settings-confirm" class="form-control" placeholder="Confirm new password">
-                                </div>
-                                <div class="form-group">
-                                    <label>Notification Preferences</label>
-                                    <div class="checkbox-group">
-                                        <input type="checkbox" id="notify-email" checked>
-                                        <label for="notify-email">Email Notifications</label>
-                                    </div>
-                                    <div class="checkbox-group">
-                                        <input type="checkbox" id="notify-sms" checked>
-                                        <label for="notify-sms">SMS Notifications</label>
-                                    </div>
-                                    <div class="checkbox-group">
-                                        <input type="checkbox" id="notify-app" checked>
-                                        <label for="notify-app">App Notifications</label>
-                                    </div>
-                                </div>
-                                <button type="submit" class="btn">Save Changes</button>
-                            </form>
-                        </div>
-                    </div>
+    <div class="container mt-5">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3">
+                <div class="card p-3 text-center shadow-sm">
+                    <h2 id="profile-name"><%= user.name %></h2>
+                    <p id="profile-email" class="text-muted"><%= user.email %></p>
                 </div>
             </div>
-        </section>
+
+            <!-- Profile Content -->
+            <div class="col-md-9">
+                <div class="profile-container">
+                    <h3>Personal Information</h3>
+                    <form>
+                        <div class="mb-3">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" class="form-control" value="<%= user.name %>" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control" value="<%= user.mobile %>" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Emergency Contact</label>
+                            <input type="tel" class="form-control" value="<%= user.emermob %>" readonly>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 
     <%- include("partials/footer.ejs") %>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

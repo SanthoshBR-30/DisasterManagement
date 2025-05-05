@@ -3,9 +3,13 @@ const path = require("path");
 const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const sosRoutes = require("./routes/sosRoutes"); // <-- Add SOS Route
+const authenticate = require("./middleware/authMiddleware");
+const profileRoutes = require("./routes/profileRoutes");
 const cors = require("cors");
 const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser");  
 require("dotenv").config();
+const User = require("./models/User"); // Adjust path as necessary
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -17,6 +21,8 @@ connectDB();
 app.use(cors());
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+app.use("/profile", authenticate, profileRoutes);
 
 // Set up EJS for rendering views
 app.set("view engine", "ejs");
@@ -49,14 +55,41 @@ app.get("/home", (req, res) => {
 app.get("/sos", (req,res) =>{
   res.render("sos");
 });
+app.get("/call", (req, res) => {
+  res.render("call");
+});
 
 app.get("/map", (req,res) =>{
   res.render("map");
 });
 
-app.get("/profile", (req,res) =>{
-  res.render("profile");
+app.get("/profile", async (req, res) => {
+  try {
+      const userId = req.user?.userId;  // ✅ Avoid undefined error
+      if (!userId) {
+          return res.status(401).send("Unauthorized: No user ID found");
+      }
+
+      const user = await User.findById(userId);
+      if (!user) {
+          return res.status(404).send("User not found");
+      }
+
+      // ✅ Ensure emergencyContacts is always an array
+      if (!user.emergencyContacts) {
+          user.emergencyContacts = [];
+      }
+
+      res.render("profile", { user });
+  } catch (error) {
+      console.error("Profile Fetch Error:", error);
+      res.status(500).send("Internal Server Error");
+  }
 });
+
+
+
+
 
 // Start the server
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
