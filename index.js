@@ -355,7 +355,12 @@ app.post('/register-volunteer', async (req, res) => {
 });
 
 // Start the server
+// if (process.env.NODE_ENV !== 'production') {
+// app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+//  }
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+module.exports = app;
 
 
 
