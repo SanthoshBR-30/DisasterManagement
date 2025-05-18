@@ -17,7 +17,7 @@ exports.register = async (req, res) => {
         user = new User({ name, email, password: hashedPassword, mobile, emermob});
         await user.save();
 
-        res.status(200).json({ message: "Signup successful", redirect: "/home" });
+        res.status(200).json({ message: "Signup successful", redirect: "/" });
     } catch (err) {
         res.status(500).json({ message: "Server Error" });
     }
@@ -36,7 +36,13 @@ exports.login = async (req, res) => {
 
         const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
 
-        res.status(200).json({ message: "Login successful", token, redirect: "/home" });
+        res.cookie("jwt", token, { 
+            httpOnly: true,  // Prevents JavaScript access
+            secure: false,   // Set to true if using HTTPS
+            sameSite: "Strict",
+        });
+
+        res.status(200).json({ message: "Login successful", token, redirect: "/" });
     } catch (err) {
         res.status(500).json({ message: "Server Error" });
     }

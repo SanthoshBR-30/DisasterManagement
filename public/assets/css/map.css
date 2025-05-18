@@ -18,14 +18,10 @@ body {
     color: var(--dark);
 }
 
-/* Map Section */
-.map-section {
-    background-color: #f8f9fa;
-}
-
 #map {
     height: 500px;
-    margin-top: 40px;
+    width: 100%;
+    margin-top: 20px;
     border-radius: 10px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
@@ -37,9 +33,8 @@ body {
 }
 
 .filter-btn {
-    background-color: white;
-    color: var(--dark);
-    border: 1px solid #ddd;
+    background-color: #f1f1f1;
+    border: 1px solid #ccc;
     padding: 10px 20px;
     margin: 0 5px;
     border-radius: 5px;
@@ -53,19 +48,12 @@ body {
     border-color: var(--primary);
 }
 
- /* Loading Spinner */
-  .loading-spinner {
+.loading-spinner {
     display: none;
-    width: 50px;
-    height: 50px;
-    border: 5px solid #f3f3f3;
-    border-top: 5px solid var(--primary);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin: 20px auto;
+    text-align: center;
+    margin-top: 20px;
 }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-} 
+.loading-spinner.active {
+    display: block;
+}

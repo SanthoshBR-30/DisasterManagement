@@ -11,7 +11,7 @@ const donationSchema = new mongoose.Schema({
     email: { type: String, required: true },
     amount: { type: Number, required: true },
     
-    paymentStatus: { type: String, default: 'pending' },
+    paymentStatus: { type: String, default: 'completed' },
     stripeSessionId: String,
     stripePaymentIntentId: String,
     createdAt: { type: Date, default: Date.now }

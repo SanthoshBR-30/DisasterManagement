@@ -4,13 +4,18 @@ const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const sosRoutes = require("./routes/sosRoutes");
 const callRoutes = require("./routes/callRoutes");
+const profileRoutes = require("./routes/profileRoutes");
+const authenticate = require("./middleware/authMiddleware");
 const Volunteer = require('./models/volunteer');
 const Donation = require("./models/donation");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const cookieParser = require("cookie-parser"); 
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY, {
+  timeout: 120000, 
+});
 
-
+const User = require("./models/User");
 require("dotenv").config();
 
 const app = express();
@@ -24,6 +29,8 @@ connectDB();
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
+app.use(cookieParser());
+app.use("/profile", authenticate, profileRoutes);
 
 app.post('/webhook', 
   express.raw({type: 'application/json'}), 
@@ -146,8 +153,28 @@ app.get("/map", (req,res) =>{
   res.render("map");
 });
 
-app.get("/profile", (req,res) =>{
-  res.render("profile");
+app.get("/profile", async (req,res) =>{
+  try {
+    const userId = req.user?.userId;  // ✅ Avoid undefined error
+    if (!userId) {
+        return res.status(401).send("Unauthorized: No user ID found");
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+        return res.status(404).send("User not found");
+    }
+
+    // ✅ Ensure emergencyContacts is always an array
+    if (!user.emergencyContacts) {
+        user.emergencyContacts = [];
+    }
+
+    res.render("profile", { user });
+} catch (error) {
+    console.error("Profile Fetch Error:", error);
+    res.status(500).send("Internal Server Error");
+}
 });
 
 app.get('/donation', (req, res) => {

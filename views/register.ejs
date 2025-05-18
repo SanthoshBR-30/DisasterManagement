@@ -87,7 +87,7 @@
                     localStorage.setItem("token", data.token); // Store token after signup
                     document.dispatchEvent(new Event("tokenUpdated")); // Trigger header update
                     alert("Signup successful! Redirecting to homepage...");
-                    window.location.href = "/home"; // Redirect to homepage
+                    window.location.href = "/"; // Redirect to homepage
                 } else {
                     alert(data.message);
                 }

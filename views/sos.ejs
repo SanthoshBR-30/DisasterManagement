@@ -77,9 +77,19 @@ async function sendSOSAlert() {
             console.error("❌ Error sending SOS request:", error);
             alert("❌ An error occurred while sending the SOS request.");
         }
-    }, () => {
-        alert("⚠️ Unable to retrieve your location.");
-    });
+     }, 
+     //() => {
+     //   alert("⚠️ Unable to retrieve your location.");
+   // }
+   (error) => {
+    console.error("❌ Geolocation Error:", error.message);
+    alert("⚠️ Unable to retrieve your location.");
+},
+     {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
+    }); 
 }
 
     </script>
